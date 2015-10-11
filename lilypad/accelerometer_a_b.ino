@@ -71,7 +71,6 @@ void loop()
  Serial.print(((float)yB - zero_G)/scale);
  Serial.print(":");
  Serial.print(((float)zB - zero_G)/scale);
- Serial.print(":");
  Serial.println("#");
  //
  // delay before next reading:
