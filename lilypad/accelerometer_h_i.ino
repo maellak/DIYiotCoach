@@ -14,6 +14,7 @@ void setup()
 {
  // initialize the serial communications:
  Serial.begin(9600);
+ Serial.setTimeout(5);
  //
  //
  //for Arduino Uno
