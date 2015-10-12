@@ -59,7 +59,7 @@ void loop()
  //Divide the shifted sensor reading by scale to get acceleration in Gs.
  float scale =102.3;
  
- Serial.print("@:E:");
+ Serial.print("@E:");
  Serial.print(((float)xA - zero_G)/scale);
  Serial.print(":");
  Serial.print(((float)yA - zero_G)/scale);
