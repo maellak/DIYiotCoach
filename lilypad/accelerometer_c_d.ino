@@ -106,8 +106,8 @@ Serial.print(((float)y2 - zero_G2)/scale2);
 
 
 Serial.print(((float)z2 - zero_G2)/scale2);
- Serial.print("#");
- Serial.print("\n");
+ Serial.println("#");
+ 
 
 
  // delay before next reading:
