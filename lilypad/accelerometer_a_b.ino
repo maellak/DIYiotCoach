@@ -14,11 +14,7 @@ void setup()
 {
  // initialize the serial communications:
  Serial.begin(9600);
- //
- //
- //for Arduino Uno
- //analogReference(EXTERNAL);
- 
+ // 
  //Make sure the analog-to-digital converter takes its reference voltage from
  // the AREF pin
  pinMode(xpinA, INPUT);
@@ -32,7 +28,6 @@ void setup()
 void loop()
 {
  int xA = analogRead(xpinA);
- 
  int xB = analogRead(xpinB);
  //
  //add a small delay between pin readings.  I read that you should
@@ -59,12 +54,13 @@ void loop()
  //Divide the shifted sensor reading by scale to get acceleration in Gs.
  float scale =102.3;
  //
- Serial.print("@:A:");
+ Serial.print("@A:");
  Serial.print(((float)xA - zero_G)/scale);
  Serial.print(":");
  Serial.print(((float)yA - zero_G)/scale);
  Serial.print(":");
  Serial.print(((float)zA - zero_G)/scale);
+ Serial.print(":");
  Serial.print("B:");
  Serial.print(((float)xB - zero_G)/scale);
  Serial.print(":");
