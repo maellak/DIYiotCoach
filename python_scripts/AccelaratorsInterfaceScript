@@ -1,0 +1,63 @@
+import re
+
+#=================@@@@@@@@@@@@@@@@@@@@@@@@@@@2
+#Ftiaximo klassewn
+
+g = 9.81
+
+#DV einai i metaboli taxutitas (v=speed)
+#DX einai i metaboli tis thesis 
+#DXtot einai i sunoliki metatopisi
+#acc einai i timi tis epitaxunsis 
+#Vo einai i timi tis taxutitas
+
+
+def calc_DX(state):
+  #prevState[acc,DX,Vo]
+  acc = state[0] * 9.81
+  DX = state[1]
+  Vo = state[2]
+  DV = acc*Dt
+  DX = Vo*Dt + (1/2)*acc*Dt*Dt
+  state[2] = Vo + DV/Dt
+  state[1] = DX
+  return state
+  
+Dt=0.005 #xronos se second tis deigmatolipsias 
+fileInput = open('test.txt', 'r')
+fileOutput = open('results.txt', 'w')
+
+#prevState[acc,DX,Vo]
+state = [-1,-1,-1]
+Dtotal = [-1,-1,-1] # sunoliki metatopisi se axones [x,y,z]
+
+
+#calc_DXtotal
+for i in range(0,10):
+  lineIn = fileInput.readline()
+  lineIn = re.sub('[\n@#]', '', lineIn)
+  lineIn = lineIn.split(':')
+  state[0] = float(lineIn[2]) #acceleration
+  state = calc_DX(state)
+  Dtotal[0] = Dtotal[0] + state[1]
+  outputString = "X: " + ",".join(str(x) for x in state) + "\n"
+  outputString += "Y: " + ",".join(str(x) for x in state) + "\n"
+  outputString += "Z: " + ",".join(str(x) for x in state) + "\n"
+  outputString += "DisplacementTotal: " + ",".join(str(x) for x in Dtotal) + "\n" 
+  
+  
+  print outputString
+  fileOutput.write(outputString)
+ 
+
+
+
+
+fileInput.close()
+fileOutput.close()
+
+
+
+
+
+
