@@ -1,13 +1,13 @@
 
 // these constants describe the pins that the two accelerometers are conected. They won't change:
                                       //accelerometer1
-const int xpin = A1;                  // x-axis 
-const int ypin = A2;                  // y-axis
-const int zpin = A3;                  // z-axis (only on 3-axis models)
+const int xpin = A0;                  // x-axis 
+const int ypin = A1;                  // y-axis
+const int zpin = A2;                  // z-axis (only on 3-axis models)
 int sampleDelay = 500;   //number of milliseconds between readings
 //                                     
                                        //accelerometer2 
-const int xpin2 = A0;                  // x-axis  
+const int xpin2 = A3;                  // x-axis  
 const int ypin2 = A4;                  // y-axis
 const int zpin2 = A5;                  // z-axis (only on 3-axis models)
 int sampleDelay2 = 500;   //number of milliseconds between readings
@@ -75,7 +75,7 @@ void loop()
  //Divide the shifted sensor reading by scale to get acceleration in Gs.
  float scale2 =102.3;
  //
- Serial.print("@C");
+ Serial.print("@C:");
  Serial.print(((float)x - zero_G)/scale);
  Serial.print(":");
 
