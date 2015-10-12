@@ -1,0 +1,41 @@
+class Calibration{
+  /* H class Calibration elenxei tis times (pou pernei apo to accelerometer) +/- range 
+    kai an einai ises me tis startingX,Y,Z
+   gia kapoio diastima (oso o Buffer)
+  ---Auto einai xrisimo oste na katalaboume pote o Paiktis einai stin arxiki 8esi,
+   --Oste apo ekei kai pera na paroume tis metriseis tis opoies 8a dosoume sto modelo mas
+ 
+   */
+  float range;//to euros la8ous pano sto X,Y,Z
+  float startingX; // timi tou X pou prepei na parei gia to calibr
+  float startingY; // timi tou Y pou prepei na parei gia to calibr
+  float startingZ; // timi tou Z pou prepei na parei gia to calibr
+  unsigned int sizeOfBuffer;
+  unsigned int ok;
+  public:
+  Calibration(float X, float Y, float Z, float errorRange,unsigned int buffSize){
+    startingX =X;
+    startingY=Y;
+    startingZ=Z;
+    ok=0;
+  };
+  void setX(float X){
+    if(startingX+range>=X && X>= startingX-range)
+      ok++;
+     else
+       ok=0;
+  };
+  void setY(float Y){
+    if(startingY+range>=Y && Y>= startingY-range)
+      ok++;
+     else
+       ok=0;
+  };
+  void setZ(float Z){
+    if(startingZ+range>=Z && Z>= startingZ-range)
+      ok++;
+     else
+       ok=0;
+  };
+  boolean 
+};
