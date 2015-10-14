@@ -4,9 +4,15 @@ class error{
    double fZg = 0;
    
    public:
-   float alpha =0.5;
+   float alpha;
    double pitch;
    double roll;
+   error(){
+      alpha =0.5;
+      fXg = 0;
+      fYg = 0;
+      fZg = 0;
+   }
   void values(double Xg, double Yg, double  Zg){
       //double pitch, roll, Xg, Yg, Zg;
       //acc.read(&Xg, &Yg, &Zg);
