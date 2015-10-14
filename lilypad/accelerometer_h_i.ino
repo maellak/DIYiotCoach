@@ -9,7 +9,7 @@ const int zpinB = A5;                  // z-axis (only on 3-axis models)
 
 
 //
-int sampleDelay = 500;   //number of milliseconds between readings
+int sampleDelay = 5;   //number of milliseconds between readings
 void setup()
 {
  // initialize the serial communications:
