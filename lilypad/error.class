@@ -1,9 +1,8 @@
 class error{
+public:
    double fXg;
    double fYg;
    double fZg;
-   
-   public:
    float alpha;
    double pitch;
    double roll;
