@@ -1,9 +1,76 @@
 import re
+import sys
+import signal
+
+#Global variables
+totalLines = 0
+g = 9.81
+# @C:-1.18:-0.16:-0.17:D:0.08:-0.31:-0.32:C:-1.24:-0.16:-0.19:D:-0.05:-0.31:-0.33#
+
+#========================================
+
+
+class sensor:
+  def __init__(self,sid):
+    self.sid = sid
+    
+  def updateCords(self,cords)
+    
+  def calc_DX(self,state):
+    #prevState[acc,DX,Vo]
+    acc = state[0] * 9.81
+    DX = state[1]
+    Vo = state[2]
+    DV = acc*Dt
+    DX = Vo*Dt + (1/2)*acc*Dt*Dt
+    state[2] = Vo + DV/Dt
+    state[1] = DX
+    return state
+
+
+#Handles exception for program end (ctrl+c)
+def signal_handler(signal, frame):
+        print "Total Number of Lines Received:" + str(totalLines)
+        fileLog.close()
+        sys.exit(0)
+
+
+
+
+
+sys.stdout.write("Starting Server\n============\n\n")
+sys.stdout.flush()
+
+
+fileLog = open('/tmp/log01.txt', 'w')
+signal.signal(signal.SIGINT, signal_handler)
+
+
+
+for line in sys.stdin:
+  #sys.stdout.write("From Python: "+line)
+  totalLines += 1
+  fileLog.write(line)
+  
+  
+  
+  
+  
+
 
 #=================@@@@@@@@@@@@@@@@@@@@@@@@@@@2
 #Ftiaximo klassewn
 
-g = 9.81
+
+# @C:-1.18:-0.16:-0.17:D:0.08:-0.31:-0.32:C:-1.24:-0.16:-0.19:D:-0.05:-0.31:-0.33#
+
+
+
+
+
+
+"""
+
 
 #DV einai i metaboli taxutitas (v=speed)
 #DX einai i metaboli tis thesis 
@@ -12,16 +79,6 @@ g = 9.81
 #Vo einai i timi tis taxutitas
 
 
-def calc_DX(state):
-  #prevState[acc,DX,Vo]
-  acc = state[0] * 9.81
-  DX = state[1]
-  Vo = state[2]
-  DV = acc*Dt
-  DX = Vo*Dt + (1/2)*acc*Dt*Dt
-  state[2] = Vo + DV/Dt
-  state[1] = DX
-  return state
   
 Dt=0.005 #xronos se second tis deigmatolipsias 
 fileInput = open('test.txt', 'r')
@@ -56,7 +113,7 @@ for i in range(0,10):
 fileInput.close()
 fileOutput.close()
 
-
+"""
 
 
 
