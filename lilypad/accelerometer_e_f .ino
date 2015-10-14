@@ -102,14 +102,14 @@ float scale =102.3;
 
 err->values(xA,yA,zA); 
 err2->values(xB,yB,zB);
-Serial.print("@A:");
+Serial.print("@E:");
 Serial.print(((float)err->getX() - zero_G)/scale);
 Serial.print(":");
 Serial.print(((float)err->getY() - zero_G)/scale);
 Serial.print(":");
 Serial.print(((float)err->getZ() - zero_G)/scale);
 Serial.print(":");
-Serial.print("B:");
+Serial.print("F:");
 Serial.print(((float)err2->getX() - zero_G)/scale);
 Serial.print(":");
 Serial.print(((float)err2->getY() - zero_G)/scale);
