@@ -6,7 +6,7 @@
 //////////////////////////////////////////////////////////
 //                                                      //
 //  @Ax:Ay:Az:Gx:Gy:Gz:Mx:My:Mz:Heading:Ax2:Ay2:Az2#    //
-//                                                      //
+//    \----------- IMU ---------------/\-Accelerometer-///
 //  A --> [g] (1g =9.81 m/s2) Accelerometer             //
 //  G --> [DEG / s]           Gyroscope                 //
 //  M --> [Gauss]             Magnetometer              //
