@@ -7,7 +7,7 @@ class error{
    float alpha =0.5;
    double pitch;
    double roll;
-  void values(double Xg, double Yg, double  Xg){
+  void values(double Xg, double Yg, double  Zg){
       //double pitch, roll, Xg, Yg, Zg;
       //acc.read(&Xg, &Yg, &Zg);
    
