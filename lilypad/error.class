@@ -1,7 +1,7 @@
 class error{
-   double fXg = 0;
-   double fYg = 0;
-   double fZg = 0;
+   double fXg;
+   double fYg;
+   double fZg;
    
    public:
    float alpha;
