@@ -9,11 +9,12 @@ const int zpinB = A5;                  // z-axis (only on 3-axis models)
 
 
 //
-int sampleDelay = 500;   //number of milliseconds between readings
+int sampleDelay = 5;   //number of milliseconds between readings
 void setup()
 {
  // initialize the serial communications:
  Serial.begin(9600);
+ Serial.setTimeout(5);
  //
  //
  //for Arduino Uno
@@ -58,14 +59,14 @@ void loop()
  //change when the acceleration along an axis changes by 1G.
  //Divide the shifted sensor reading by scale to get acceleration in Gs.
  float scale =102.3;
- //
- Serial.print("@:A:");
+ 
+ Serial.print("@E:");
  Serial.print(((float)xA - zero_G)/scale);
  Serial.print(":");
  Serial.print(((float)yA - zero_G)/scale);
  Serial.print(":");
  Serial.print(((float)zA - zero_G)/scale);
- Serial.print("B:");
+ Serial.print(":F:");
  Serial.print(((float)xB - zero_G)/scale);
  Serial.print(":");
  Serial.print(((float)yB - zero_G)/scale);

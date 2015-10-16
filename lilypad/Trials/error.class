@@ -1,0 +1,29 @@
+class error{
+public:
+   double fXg;
+   double fYg;
+   double fZg;
+   float alpha;
+   double pitch;
+   double roll;
+   error(){
+      alpha =0.5;
+      fXg = 0;
+      fYg = 0;
+      fZg = 0;
+   }
+  void values(double Xg, double Yg, double  Zg){
+      //double pitch, roll, Xg, Yg, Zg;
+      //acc.read(&Xg, &Yg, &Zg);
+   
+      //Low Pass Filter
+      fXg = Xg * alpha + (fXg * (1.0 - alpha));
+      fYg = Yg * alpha + (fYg * (1.0 - alpha));
+      fZg = Zg * alpha + (fZg * (1.0 - alpha));
+   
+      //Roll & Pitch Equations
+      roll  = (atan2(-fYg, fZg)*180.0)/M_PI;
+      pitch = (atan2(fXg, sqrt(fYg*fYg + fZg*fZg))*180.0)/M_PI;
+   
+    };
+};
