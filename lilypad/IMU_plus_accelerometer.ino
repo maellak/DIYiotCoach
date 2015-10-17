@@ -2,6 +2,54 @@
 #include <Wire.h>
 #include <SFE_LSM9DS0.h>
 
+//lillypad accel filter
+class error{
+public:
+double fXg;
+double fYg;
+double fZg;
+float alpha;
+double pitch;
+double roll;
+  error(){
+  alpha =0.5;
+  fXg = 0;
+  fYg = 0;
+  fZg = 0;
+  };
+  void values(double Xg, double Yg, double Zg){
+  //double pitch, roll, Xg, Yg, Zg;
+  //acc.read(&Xg, &Yg, &Zg);
+  
+  //Low Pass Filter
+  fXg = Xg * alpha + (fXg * (1.0 - alpha));
+  fYg = Yg * alpha + (fYg * (1.0 - alpha));
+  fZg = Zg * alpha + (fZg * (1.0 - alpha));
+  
+  //Roll & Pitch Equations
+  roll = (atan2(-fYg, fZg)*180.0)/M_PI;
+  pitch = (atan2(fXg, sqrt(fYg*fYg + fZg*fZg))*180.0)/M_PI;
+  
+  };
+  double getX(){
+    return fXg;
+  };
+  double getY(){
+    return fYg;
+  };
+  double getZ(){
+    return fZg;
+  };
+};
+
+// these constants describe the lilypad accelerometer  pins. They won't change:
+const int xpinAacc = A0; // x-axis of the accelerometer
+const int ypinAacc= A1; // y-axis
+const int zpinAacc = A2; // z-axis (only on 3-axis models)
+
+int sampleDelay = 5; //number of milliseconds between readings
+error *err;
+error *err2;
 
 //////////////////////////////////////////////////////////
 //                                                      //
@@ -70,7 +118,7 @@ LSM9DS0 dof(MODE_I2C, LSM9DS0_G, LSM9DS0_XM);
 
 #define PRINT_CALCULATED
 // #define PRINT_RAW //
-#define PRINT_SPEED 500 // 1000 ms between prints
+#define PRINT_SPEED 2.5 // 5 ms between prints
 #define Kp 2.0f * 5.0f // these are the free parameters in the Mahony filter and fusion scheme, Kp for proportional feedback, Ki for integral
 #define Ki 0.0f
 
@@ -103,12 +151,22 @@ void setup()
  pinMode(ypinA, INPUT);
  pinMode(zpinA, INPUT);
   
-  Serial.begin(9600); // Start serial at 9600 bps 
+  Serial.begin(9600); // Start serial at 9600 bps
+  Serial.setTimeout(5); 
+
+  err = new error();
+  err2 =new error();
+
+pinMode(xpinAacc, INPUT);
+pinMode(ypinAacc, INPUT);
+pinMode(zpinAacc, INPUT);
+
   //uint16_t status = dof.begin();
   //uint16_t status = dof.begin(dof.G_SCALE_245DPS, 
   //dof.A_SCALE_2G, dof.M_SCALE_2GS);
   uint16_t status =  dof.begin(dof.G_SCALE_245DPS, dof.A_SCALE_2G, dof.M_SCALE_2GS,dof.G_ODR_95_BW_125, dof.A_ODR_50, dof.M_ODR_3125);
   dof.setAccelABW(dof.A_ABW_773);  
+
 }
 
 //-----------------------------------------------------------------------
@@ -116,6 +174,52 @@ void setup()
 void loop()
 { 
 
+//acellerometer lilypad
+int xAacc = analogRead(xpinAacc);
+//int xB = analogRead(xpinB);
+//
+//add a small delay between pin readings. I read that you should
+//do this but haven't tested the importance
+delay(1);
+//
+int yAacc = analogRead(ypinAacc);
+//int yB = analogRead(ypinB);
+//
+//add a small delay between pin readings. I read that you should
+//do this but haven't tested the importance
+delay(1);
+//
+int zAacc = analogRead(zpinAacc);
+//int zB = analogRead(zpinB);
+//
+//zero_G is the reading we expect from the sensor when it detects
+//no acceleration. Subtract this value from the sensor reading to
+//get a shifted sensor reading.
+float zero_G =512;
+//
+//scale is the number of units we expect the sensor reading to
+//change when the acceleration along an axis changes by 1G.
+//Divide the shifted sensor reading by scale to get acceleration in Gs.
+float scale =102.3;
+//
+
+err->values(xAacc,yAacc,zAacc); 
+
+Serial.print("M:");
+Serial.print(":");
+Serial.print(((float)err->getX() - zero_G)/scale);
+Serial.print(":");
+Serial.print(((float)err->getY() - zero_G)/scale);
+Serial.print(":");
+Serial.print(((float)err->getZ() - zero_G)/scale);
+//Serial.print(":");
+Serial.println("#");
+
+//
+// delay before next reading:
+delay(sampleDelay);
+
+//lms9ds0
  int xA = analogRead(xpinA);
  //
  //add a small delay between pin readings.  I read that you should
@@ -133,12 +237,12 @@ void loop()
  //zero_G is the reading we expect from the sensor when it detects
  //no acceleration.  Subtract this value from the sensor reading to
  //get a shifted sensor reading.
- float zero_G =512; 
+
  //
  //scale is the number of units we expect the sensor reading to
  //change when the acceleration along an axis changes by 1G.
  //Divide the shifted sensor reading by scale to get acceleration in Gs.
- float scale =102.3;
+ 
  //
   
   // Accelometer Calibration
@@ -173,39 +277,18 @@ void loop()
   R_y = a_ngl_e (ax,ay,az,0);
   R_x = a_ngl_e (ax,ay,az,1);  
   
-  Serial.print('@');
+  Serial.print("@J:");
   printAccel();           // Print "A: ax, ay, az"
-  Serial.print(':');
+  Serial.print(":K:");
   printGyro();            // Print "G: gx, gy, gz"
-  Serial.print(':');
+  Serial.print(":L:");
   calcuMag();             // Calculate "M: mx, my, mz"
-  Serial.print(':');
+  Serial.print(":");
   //printHeading(mx, my, mz);   // Print Heading - works only in if the sensor is flat (z-axis normal to Earth).
   
   printHeading_2(mx, my, mz, R_y, R_x);
   
-   //
    
- // Serial.print("@A:");
- Serial.print(((float)xA - zero_G)/scale);
- Serial.print(":");
- Serial.print(((float)yA - zero_G)/scale);
- Serial.print(":");
- Serial.print(((float)zA - zero_G)/scale);
- // Serial.println("#");
- // 
-  
-  //Serial.print(':');
-  //Serial.print("Degrees Y - AXIS: ");
-  //Serial.print(R_y);
-  //Serial.print(':');
-  //Serial.print(R_x);
-  Serial.println('#');
-  //Serial.println();
-  //Serial.print("Degrees X - AXIS: ");
-  //Serial.print(R_x);
-  //Serial.println();
-  //Serial.println(); 
   delay(PRINT_SPEED);
 }
 
@@ -244,13 +327,13 @@ void printAccel()
   char buffa[10];
   String AccelString = "";
 
-  dtostrf(ax, 4, 2, buffa);  //5 is mininum width, 2 is precision
+  dtostrf(ax, 4, 2, buffa);  //4 is mininum width, 2 is precision
   AccelString += buffa;
   AccelString += ":";
-  dtostrf(ay, 4, 2, buffa);  //5 is mininum width, 2 is precision
+  dtostrf(ay, 4, 2, buffa);  //4 is mininum width, 2 is precision
   AccelString += buffa;
   AccelString += ":";
-  dtostrf(az, 4, 2, buffa);  //5 is mininum width, 2 is precision
+  dtostrf(az, 4, 2, buffa);  //4 is mininum width, 2 is precision
   AccelString += buffa;
 
   Serial.print(AccelString); 
@@ -268,16 +351,16 @@ void printGyro()
   char buffg[10];
   String GyroString = "";
    
-  dtostrf(gx, 4, 2, buffg);  //5 is mininum width, 2 is precision
+  dtostrf(gx, 4, 2, buffg);  //4 is mininum width, 2 is precision
   GyroString += buffg;
   GyroString += ":";
-  dtostrf(gy, 4, 2, buffg);  //5 is mininum width, 2 is precision
+  dtostrf(gy, 4, 2, buffg);  //4 is mininum width, 2 is precision
   GyroString += buffg;
   GyroString += ":";
-  dtostrf(gz, 4, 2, buffg);  //5 is mininum width, 2 is precision
+  dtostrf(gz, 4, 2, buffg);  //4 is mininum width, 2 is precision
   GyroString += buffg;
 
-  Serial.print(GyroString);               //
+ Serial.print(GyroString);               
 }
 
 //-----------------------------------------------------------------------
@@ -291,13 +374,13 @@ void calcuMag()
    
   char buffm[10];
   String MagString = "";
-  dtostrf(mx, 4, 2, buffm);  //5 is mininum width, 2 is precision
+  dtostrf(mx, 4, 2, buffm);  //4 is mininum width, 2 is precision
   MagString += buffm;
   MagString += ":";
-  dtostrf(my, 4, 2, buffm);  //5 is mininum width, 2 is precision
+  dtostrf(my, 4, 2, buffm);  //4 is mininum width, 2 is precision
   MagString += buffm;
   MagString += ":";
-  dtostrf(mz, 4, 2, buffm);  //5 is mininum width, 2 is precision
+  dtostrf(mz, 4, 2, buffm);  //4 is mininum width, 2 is precision
   MagString += buffm;
   Serial.print(MagString); 
 }
@@ -327,7 +410,7 @@ void printHeading(float hx, float hy, float hz)
   dtostrf(heading, 5, 2, buffh);  //5 is mininum width, 2 is precision
   HeadString += buffh;
   
-  Serial.print(HeadString);
+  //Serial.print(HeadString);
 }
 
 //-----------------------------------------------------------------------
@@ -378,7 +461,7 @@ void printHeading_1(float hx, float hy, float hz, float rol, float pitc)
   dtostrf(heading, 5, 2, buffh);  //5 is mininum width, 2 is precision
   HeadString += buffh;
   
-  Serial.print(HeadString);
+  //Serial.print(HeadString);
 }
 
 
@@ -437,7 +520,7 @@ void printHeading_2(float hx, float hy, float hz, float rol, float pitc)
   dtostrf(heading, 5, 2, buffh);  //5 is mininum width, 2 is precision
   HeadString += buffh;
   
-  Serial.print(HeadString);
+  //Serial.print(HeadString);
 }
 
 //-----------------------------------------------------------------------
