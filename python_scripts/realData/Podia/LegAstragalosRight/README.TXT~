@@ -1,0 +1,1 @@
+'F':  # Aristero astragalos
