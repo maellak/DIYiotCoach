@@ -9,8 +9,8 @@ double fXg;
 double fYg;
 double fZg;
 float alpha;
-double pitch;
-double roll;
+//double pitch;
+//double roll;
   error(){
   alpha =0.5;
   fXg = 0;
@@ -27,8 +27,8 @@ double roll;
   fZg = Zg * alpha + (fZg * (1.0 - alpha));
   
   //Roll & Pitch Equations
-  roll = (atan2(-fYg, fZg)*180.0)/M_PI;
-  pitch = (atan2(fXg, sqrt(fYg*fYg + fZg*fZg))*180.0)/M_PI;
+  //roll = (atan2(-fYg, fZg)*180.0)/M_PI;
+  //pitch = (atan2(fXg, sqrt(fYg*fYg + fZg*fZg))*180.0)/M_PI;
   
   };
   double getX(){
@@ -286,7 +286,7 @@ delay(sampleDelay);
   Serial.print(":");
   //printHeading(mx, my, mz);   // Print Heading - works only in if the sensor is flat (z-axis normal to Earth).
   
-  printHeading_2(mx, my, mz, R_y, R_x);
+  //printHeading_2(mx, my, mz, R_y, R_x);
   
    
   //delay(PRINT_SPEED);
