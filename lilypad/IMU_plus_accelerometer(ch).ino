@@ -648,8 +648,8 @@ void printOrientation(float x, float y, float z)
   pitch *= 180.0 / PI;
   roll *= 180.0 / PI;
   
-  Serial.print("Pitch, Roll: ");
-  Serial.print(pitch, 2);
-  Serial.print(", ");
-  Serial.println(roll, 2);
+  //Serial.print("Pitch, Roll: ");
+  //Serial.print(pitch, 2);
+  //Serial.print(", ");
+  //Serial.println(roll, 2);
 }
