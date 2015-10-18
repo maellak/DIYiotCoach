@@ -47,7 +47,7 @@ const int xpinAacc = A0; // x-axis of the accelerometer
 const int ypinAacc= A1; // y-axis
 const int zpinAacc = A2; // z-axis (only on 3-axis models)
 
-int sampleDelay = 5; //number of milliseconds between readings
+int sampleDelay = 1; //number of milliseconds between readings
 error *err;
 error *err2;
 
