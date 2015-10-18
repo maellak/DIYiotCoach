@@ -118,7 +118,7 @@ LSM9DS0 dof(MODE_I2C, LSM9DS0_G, LSM9DS0_XM);
 
 #define PRINT_CALCULATED
 // #define PRINT_RAW //
-#define PRINT_SPEED 2.5 // 5 ms between prints
+//#define PRINT_SPEED 2.5 // 5 ms between prints
 #define Kp 2.0f * 5.0f // these are the free parameters in the Mahony filter and fusion scheme, Kp for proportional feedback, Ki for integral
 #define Ki 0.0f
 
@@ -180,14 +180,14 @@ int xAacc = analogRead(xpinAacc);
 //
 //add a small delay between pin readings. I read that you should
 //do this but haven't tested the importance
-delay(1);
+//delay(1);
 //
 int yAacc = analogRead(ypinAacc);
 //int yB = analogRead(ypinB);
 //
 //add a small delay between pin readings. I read that you should
 //do this but haven't tested the importance
-delay(1);
+//delay(1);
 //
 int zAacc = analogRead(zpinAacc);
 //int zB = analogRead(zpinB);
@@ -224,13 +224,13 @@ delay(sampleDelay);
  //
  //add a small delay between pin readings.  I read that you should
  //do this but haven't tested the importance
-   delay(1); 
+   //delay(1); 
  //
  int yA = analogRead(ypinA);
  //
  //add a small delay between pin readings.  I read that you should
  //do this but haven't tested the importance
-   delay(1); 
+   //delay(1); 
  //
  int zA = analogRead(zpinA);
  //
@@ -289,7 +289,7 @@ delay(sampleDelay);
   printHeading_2(mx, my, mz, R_y, R_x);
   
    
-  delay(PRINT_SPEED);
+  //delay(PRINT_SPEED);
 }
 
 //-----------------------------------------------------------------------
