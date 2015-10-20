@@ -112,8 +112,14 @@ def moveTennisPlayer(line):
 		i+=4
 		if ID == 'A': #Aristeri palami			
 			#bpy.ops.object.select_pattern(pattern="forearm.L")			
-			bpy.ops.object.select_pattern(pattern="hand.fk.L")
+			bpy.ops.object.select_pattern(pattern="shin.fk.L")
 			#bpy.ops.transform.rotate(value=-1.40891, axis=(findRoll(float(x), float(y), float(z)), findPitch(float(x), float(y), float(z)),-0.458268))
+			if bpy.context.object.pose.bones["shin.fk.L"].constraints["Limit Rotation"].min_x > bpy.context.object.pose.bones["shin.fk.L"].rotation_quaternion[1]:
+				bpy.context.object.pose.bones["shin.fk.L"].rotation_quaternion[1] = bpy.context.object.pose.bones["shin.fk.L"].constraints["Limit Rotation"].min_x
+			if bpy.context.object.pose.bones["shin.fk.L"].constraints["Limit Rotation"].max_x < bpy.context.object.pose.bones["shin.fk.L"].rotation_quaternion[1]:
+				bpy.context.object.pose.bones["shin.fk.L"].rotation_quaternion[1] = bpy.context.object.pose.bones["shin.fk.L"].constraints["Limit Rotation"].max_x
+
+
 			bpy.ops.transform.rotate(value=findRoll(float(x), float(y), float(z)), axis=(1,0,0))			
 			bpy.ops.transform.rotate(value=findPitch(float(x), float(y), float(z)), axis=(0,1,0))
 			bpy.ops.transform.translate(value=(float(x), float(y), float(z)))
