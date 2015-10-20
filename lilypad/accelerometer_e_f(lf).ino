@@ -53,7 +53,7 @@ error *err2;
 void setup()
 {
 // initialize the serial communications:
-Serial.begin(9600);
+Serial.begin(11500);
 Serial.setTimeout(5);
 err = new error();
 err2 =new error();
