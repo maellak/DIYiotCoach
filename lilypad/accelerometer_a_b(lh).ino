@@ -47,7 +47,7 @@ const int zpinB = A5; // z-axis (only on 3-axis models)
 
 
 //
-int sampleDelay = 5; //number of milliseconds between readings
+int sampleDelay = 3; //number of milliseconds between readings
 error *err;
 error *err2;
 void setup()
@@ -77,14 +77,14 @@ int xB = analogRead(xpinB);
 //
 //add a small delay between pin readings. I read that you should
 //do this but haven't tested the importance
-//delay(1);
+delay(1);
 //
 int yA = analogRead(ypinA);
 int yB = analogRead(ypinB);
 //
 //add a small delay between pin readings. I read that you should
 //do this but haven't tested the importance
-//delay(1);
+delay(1);
 //
 int zA = analogRead(zpinA);
 int zB = analogRead(zpinB);

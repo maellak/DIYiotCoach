@@ -47,7 +47,7 @@ const int zpinB = A5; // z-axis (only on 3-axis models)
 
 
 //
-int sampleDelay = 5; //number of milliseconds between readings
+int sampleDelay = 3; //number of milliseconds between readings
 error *err;
 error *err2;
 void setup()
