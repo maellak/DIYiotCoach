@@ -118,7 +118,7 @@ def moveTennisPlayer(line):
 				bpy.context.object.pose.bones["shin.fk.L"].rotation_quaternion[1] = bpy.context.object.pose.bones["shin.fk.L"].constraints["Limit Rotation"].min_x
 			if bpy.context.object.pose.bones["shin.fk.L"].constraints["Limit Rotation"].max_x < bpy.context.object.pose.bones["shin.fk.L"].rotation_quaternion[1]:
 				bpy.context.object.pose.bones["shin.fk.L"].rotation_quaternion[1] = bpy.context.object.pose.bones["shin.fk.L"].constraints["Limit Rotation"].max_x
-
+				
 
 			bpy.ops.transform.rotate(value=findRoll(float(x), float(y), float(z)), axis=(1,0,0))			
 			bpy.ops.transform.rotate(value=findPitch(float(x), float(y), float(z)), axis=(0,1,0))
