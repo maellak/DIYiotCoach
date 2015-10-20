@@ -47,13 +47,13 @@ const int zpinB = A5; // z-axis (only on 3-axis models)
 
 
 //
-int sampleDelay = 5; //number of milliseconds between readings
+int sampleDelay = 3; //number of milliseconds between readings
 error *err;
 error *err2;
 void setup()
 {
 // initialize the serial communications:
-Serial.begin(9600);
+Serial.begin(11500);
 Serial.setTimeout(5);
 err = new error();
 err2 =new error();
