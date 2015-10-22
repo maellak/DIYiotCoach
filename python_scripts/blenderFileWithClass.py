@@ -57,8 +57,8 @@ class ManageSensor:
 		self.qFz.put(nZ)        
 
 		x = self.qFsumX / self.qFx.qsize()
-		y = self.qFsumX / self.qFy.qsize()
-		z = self.qFsumX / self.qFz.qsize()
+		y = self.qFsumY / self.qFy.qsize()
+		z = self.qFsumZ / self.qFz.qsize()
 
 		#Calc pitch and roll :
 		self.curPitch = math.atan2(x, math.sqrt(y * y) + (z * z))
