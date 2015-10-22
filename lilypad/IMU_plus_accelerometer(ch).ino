@@ -151,7 +151,7 @@ void setup()
  pinMode(ypinA, INPUT);
  pinMode(zpinA, INPUT);
   
-  Serial.begin(9600); // Start serial at 9600 bps
+  Serial.begin(115200); // Start serial at 9600 bps
   Serial.setTimeout(5); 
 
   err = new error();
