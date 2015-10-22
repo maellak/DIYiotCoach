@@ -4,11 +4,17 @@
 LSM303 compass;
 
 void setup() {
-  Serial.begin(9600);
+  Serial.begin(115200);
   Wire.begin();
   compass.init();
   compass.enableDefault();
-  
+  /*Arduino      LSM303 board
+-------------------------
+     5V  ->  VIN
+    GND  ->  GND
+     A4  ->  SDA
+     A5  ->  SCL
+    /*
   /*
   Calibration values; the default values of +/-32767 for each axis
   lead to an assumed magnetometer bias of 0. Use the Calibrate example
