@@ -45,7 +45,7 @@ void loop() {
   
   to use the +Z axis as a reference.
   */
-  // float heading = compass.heading();
+   float heading = compass.heading();
   float headingx = compass.heading((LSM303::vector<int>){1, 0, 0});
   float headingy = compass.heading((LSM303::vector<int>){0, 1, 0});
   float headingz = compass.heading((LSM303::vector<int>){0, 0, 1});
