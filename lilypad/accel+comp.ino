@@ -52,7 +52,7 @@ void loop() {
   
   
   // Serial.println(heading);
-  Serial.print('@E');
+  Serial.print("@E");
   Serial.print(':');
   Serial.print(headingx);
   Serial.print(':');
