@@ -1,0 +1,1 @@
+'A': #Aristeri palami
