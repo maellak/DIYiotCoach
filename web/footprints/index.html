@@ -1,0 +1,318 @@
+<!-- 
+	Otan fortonei h selida kateuazei apo to server ta dia8esima set pou uparxoun
+		kai ta bazei se ena dropDownMenu 
+		enimeroseSetKiniseon()
+	Otan o xristis epileksei ena apo ta dia8esima set kateuazei tis kiniseis autou tou set
+		kai arxizei tin anaparagogi
+		onDropDownChange() ==> getFileAndStartAnimate()
+	Arxizei h anaparstasi kai stamataei otan teliosoun oi kiniseis
+ -->
+<!DOCTYPE HTML>
+<html style="height:100%">
+<head>
+	<title>pixi.js example 1</title>
+	<style>
+		body {
+			margin: 0;
+			padding: 0;
+			background-color: #000000;
+			height: 100%;
+			
+		}
+	</style>
+	<script src="pixi.js"></script>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+
+</head>
+<script>
+	function onDropDownChange(input){
+		//alert("menu change: "+input);
+		drawObj[0].resetCounter();
+		getFileAndStartAnimate("eicar.com.txt");
+	};
+	function getFileAndStartAnimate(Url){
+			$.ajax({url: Url, success: function(result){
+				input = result;
+				//alert(input);
+				animate();
+			}});
+	};
+	function getRawFile(Url, callThisWhenSuccess){
+			$.ajax({url: Url, success: callThisWhenSuccess});
+	};
+	function textToJson(input){
+			return JSON.parse(input);
+	};
+	function enimeroseSetKiniseon(url,dropDownMenu){
+		getRawFile(url,function(data){
+			console.log(data);
+			var json = textToJson(data);
+			console.log(json);
+			for(var i=0;i<json.kiniseis.length;i++){
+				dropDownMenu.innerHTML +=  "<option value=\""+json.kiniseis[i].id+"\">"+json.kiniseis[i].name+"</option>"
+				
+			}
+		});
+	}
+	function init(){
+		console.log("init called ");
+		width = body.clientWidth;
+		height = body.clientHeight;
+		
+			stage = new PIXI.Stage(0x66FF99);
+			renderer = PIXI.autoDetectRenderer(width, height);
+			document.body.appendChild(renderer.view);
+			height = body.clientHeight;
+			
+		drawObj.push(new drawObject("fLeft.png"),"A");
+		//drawObj.push(new drawObject("rectangle"),"B");
+		w = width;
+		h = height;
+		//bunny.goTo(h/2,w/2);
+		//console.log(body);
+		console.log(height);
+		console.log(width);
+		
+		drawObj[0].goTo(150,200);
+		drawObj[0].scale(0.1);
+		drawObj[0].regObjectToStage(stage);
+		//requestAnimFrame(animate);
+		/*
+				requestAnimFrame( aanimate );
+
+			// create a texture from an image path
+			var texture = PIXI.Texture.fromImage("bunny.png");
+			// create a new Sprite using the texture
+			var abunny = new PIXI.Sprite(texture);
+
+			// center the sprites anchor point
+			abunny.anchor.x = 0.5;
+			abunny.anchor.y = 0.5;
+
+			// move the sprite t the center of the screen
+			abunny.position.x = 300;
+			abunny.position.y = 100;
+			stage.addChild(abunny);
+			//stage.addChild(bunny.getRef());
+			
+			
+
+			function aanimate() {
+
+				requestAnimFrame( aanimate );
+
+				// just for fun, lets rotate mr rabbit a little
+				abunny.rotation += 0.1;
+				drawObj[0].rotate(0.1);
+				console.log("animate");
+				// render the stage
+				renderer.render(stage);
+			}
+		*/
+		
+	}
+	function animate() {
+	    requestAnimFrame( animate );
+	
+	    // just for fun, lets rotate mr rabbit a little
+	    //bunny.rotate(0.1);
+		
+		
+				drawObj[0].rotate(10);
+				drawObj[0].goTo(testY,testY);
+				console.log(testY+","+testY);
+				testY++;
+				if(testY>width)
+					testY=0;
+			renderer.render(stage);	
+			//requestAnimFrame( animate );
+				
+		//var x = (Math.random()*1000)%w;
+		//var y = (Math.random()*1000)%h;
+		//bunny.goTo(x,y);
+		//if(counter < input.length()){
+			
+			//counter++
+		//}
+		/*
+		if(bunny.moveFromFile()){
+			requestAnimFrame( animate );
+			renderer.render(stage);
+			//return null;
+		}else{
+			console.log("Animate running...");
+		}
+		*/
+	    // render the stage   
+	    
+	};
+	function drawObject(icon, ID){
+		this.texture = PIXI.Texture.fromImage(icon);
+		this.myObj= new PIXI.Sprite(this.texture);
+		this.myObj.anchor.x = 0.1;
+		this.myObj.anchor.y = 0.1; 
+		this.counter=0;
+		this.input;
+		this.id=ID;
+		
+		
+	};
+	drawObject.prototype.goTo = function(x,y){
+		this.myObj.position.x=x;
+		this.myObj.position.y=y;
+	};
+	drawObject.prototype.goToX = function(x){
+		this.myObj.position.x=x;
+	};
+	drawObject.prototype.gotoY = function(y){
+		this.myObj.position.y=y;
+	};
+	drawObject.prototype.moveX = function(x){
+		this.myObj.position.x+=x;
+	};
+	drawObject.prototype.moveY = function(y){
+		this.myObj.position.y+=y;
+	};
+	drawObject.prototype.rotate = function(c){
+		this.myObj.rotation +=c;
+	}
+	drawObject.prototype.getRef = function(){
+		return this.myObj;
+	}
+	drawObject.prototype.moveFromFile = function(){
+		if((this.counter)+1 > input.length)
+			return 0;
+		var id = input.charAt(this.counter);
+		this.counter++;
+		var next = getPosOfNum(input,this.counter);
+		var value = input.substring(this.counter,this.counter+next);
+		console.log("value: "+value+" counter="+this.counter+" next"+next+" input.len="+input.length);
+		value = parseInt(value);
+		if(id=='x'){
+			console.log("x="+value);
+			this.myObj.position.x+=value;
+		}else if(id == 'y'){
+			console.log("y="+value);
+			this.myObj.position.y+=value;
+		}else{
+			console.log("c="+value);
+			this.myObj.rotation +=value;
+		}
+		this.counter+=next;
+		return 1;
+	}
+	drawObject.prototype.moveFromJson = function(){
+		if(counter+1 > input.length)
+			return 0;
+		var id = input.charAt(counter);
+		counter++;
+		var next = getPosOfNum(input,counter);
+		var value = input.substring(counter,counter+next);
+		console.log("value: "+value+" counter="+counter+" next"+next+" input.len="+input.length);
+		value = parseInt(value);
+		if(id=='x'){
+			console.log("x="+value);
+			this.myObj.position.x+=value;
+		}else if(id == 'y'){
+			console.log("y="+value);
+			this.myObj.position.y+=value;
+		}else{
+			console.log("c="+value);
+			this.myObj.rotation +=value;
+		}
+		counter+=next;
+		return 1;
+	}
+	drawObject.prototype.resetCounter = function(){
+		this.counter=0;
+	}
+	drawObject.prototype.setMoves = function(textFile){
+		this.input = textFile;
+	}
+	drawObject.prototype.setMoves = function(jsonText){
+		this.input = this.textToJson(jsonText);
+		console.log(this.input);
+		this.keepOnlyMyMoves();
+		this.sortJsonMovesbyTime();
+	}
+	drawObject.prototype.textToJson = function(text){
+		return JSON.parse(text);
+	}
+	drawObject.prototype.keepOnlyMyMoves = function(){
+		var temp=[];
+		for(var i=0; i<this.input.json.length; i++){
+			for(var it in this.input.json[i])
+				if(it == this.id)
+					temp.push(this.input.json[i][it]);
+		}
+		input = temp;
+	}
+	drawObject.prototype.sortJsonMovesbyTime = function(){
+		var temp;
+		var ok=true;
+		while(!ok){
+			ok=true;
+			for(var i=1;i<this.input.length;i++)
+				if(this.input[i].t<this.input[i-1].t){
+					temp = this.input[i].t;
+					this.input[i].t = this.input[i-1].t;
+					this.input[i-1].t = temp;
+					ok=false;
+				}
+		}
+	}
+	drawObject.prototype.regObjectToStage = function(stage){
+		stage.addChild(this.myObj);
+	}
+	drawObject.prototype.scale = function(value){
+		this.myObj.scale.x=value;
+		this.myObj.scale.y=value;
+	}
+	
+
+	function getPosOfNum(text,counter){
+		var c = counter;
+		var res = 0;
+		for(var i=counter; i<text.length;i++){
+			if(text.charAt(c)>='0' && '9'>= text.charAt(c) || text.charAt(c) =='-'){
+				res++;
+				c++;
+			}else
+				break;
+		}
+		return res;
+	}
+	//
+</script>
+<body id="body" >
+	<div id="menu">
+		<h3>Epelekse ena apo ta dia8esima set kiniseon</h3>
+		 <select id="select" onchange="onDropDownChange(this.value)">
+		</select>
+		<button onclick="alert('click');">test</button>
+	</div>
+	<script>
+	var body = document.getElementById("body");
+	var dropDownMenu = document.getElementById("select");
+	var width;
+	var height;
+	var stage;
+	var drawObj = new Array();
+	var w;
+	var h;
+	var testX=0;
+	var testY=0;
+	
+	//getFileAndStartAnimate("eicar.com.txt");
+	//var test = new drawObject("bunny.png",0,0);
+	//getRawFile("eicar.com.txt", function(data){alert("download OK!"+data)})
+	enimeroseSetKiniseon("setKiniseon.txt",dropDownMenu);
+	//init();
+	//input = "q1w2e3r4r5t6";
+	//for(var i=0;i<10;i++)
+		//test.moveFromFile();
+		init();
+	</script>
+
+	</body>
+</html>

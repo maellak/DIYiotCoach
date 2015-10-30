@@ -1,0 +1,27 @@
+<html>
+<head>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+</head>
+
+<body id="body">
+
+	
+
+	<script>
+		
+		function getFile2(Url){
+			return $.ajax({url: Url});
+	};
+	
+	//alert(getFile("eicar.com.txt"));
+	var site="eicar.com.txt";
+	var input_text = getFile2(site);
+	console.log(input_text);
+	input_text.success(function(data){
+		alert(data);
+	});
+	
+	</script>
+
+</body>
+</html>
