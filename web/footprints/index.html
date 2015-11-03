@@ -10,6 +10,7 @@
 <!DOCTYPE HTML>
 <html style="height:100%">
 <head>
+	 <meta charset="UTF-8"> 
 	<title>pixi.js example 1</title>
 	<style>
 		body {
@@ -20,7 +21,8 @@
 			
 		}
 	</style>
-	<script src="pixi.js"></script>
+	<!--<script src="pixi.js"></script> -->
+	<script src="https://raw.githubusercontent.com/pixijs/pixi.js/master/bin/pixi.js"></script>
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
 
 </head>
@@ -28,7 +30,17 @@
 	function onDropDownChange(input){
 		//alert("menu change: "+input);
 		drawObj[0].resetCounter();
-		getFileAndStartAnimate("eicar.com.txt");
+		//getFileAndStartAnimate("eicar.com.txt");
+		getFileAndFillPlayerWithMoves("movesJSON.txt");
+	};
+	function getFileAndFillPlayerWithMoves(Url){
+			$.ajax({url: Url, success: function(result){
+				input = result;
+				//alert(input);
+				input = textToJson(input);
+				console.log(input);
+				//animate();
+			}});
 	};
 	function getFileAndStartAnimate(Url){
 			$.ajax({url: Url, success: function(result){
@@ -45,72 +57,77 @@
 	};
 	function enimeroseSetKiniseon(url,dropDownMenu){
 		getRawFile(url,function(data){
-			console.log(data);
+			//console.log(data);
 			var json = textToJson(data);
-			console.log(json);
+			//console.log(json);
 			for(var i=0;i<json.kiniseis.length;i++){
-				dropDownMenu.innerHTML +=  "<option value=\""+json.kiniseis[i].id+"\">"+json.kiniseis[i].name+"</option>"
+				dropDownMenu.innerHTML +=  "<option value=\""+json.host+json.kiniseis[i].id+"\">"+json.kiniseis[i].name+"</option>"
 				
 			}
 		});
 	}
-	function init(){
-		console.log("init called ");
-		width = body.clientWidth;
-		height = body.clientHeight;
-		
-			stage = new PIXI.Stage(0x66FF99);
-			renderer = PIXI.autoDetectRenderer(width, height);
-			document.body.appendChild(renderer.view);
+	function stage(body){
+
+		this.width = body.clientWidth;
+		this.height = body.clientHeight;
+		//this.stage = new PIXI.Stage(0x66FF99); //OLD VERSION
+		this.stage = new PIXI.Container();
+		this.renderer = PIXI.autoDetectRenderer(width, height);
+			body.appendChild(this.renderer.view);
 			height = body.clientHeight;
-			
-		drawObj.push(new drawObject("fLeft.png"),"A");
+		this.objects = new Array();
+		this.res = new Array();
+		//drawObj.push(new drawObject("fLeft.png"),"A");
 		//drawObj.push(new drawObject("rectangle"),"B");
-		w = width;
-		h = height;
-		//bunny.goTo(h/2,w/2);
-		//console.log(body);
-		console.log(height);
-		console.log(width);
 		
-		drawObj[0].goTo(150,200);
-		drawObj[0].scale(0.1);
-		drawObj[0].regObjectToStage(stage);
+		//drawObj[0].goTo(150,200);
+		//drawObj[0].scale(0.1);
+		//drawObj[0].regObjectToStage(stage);
 		//requestAnimFrame(animate);
-		/*
-				requestAnimFrame( aanimate );
-
-			// create a texture from an image path
-			var texture = PIXI.Texture.fromImage("bunny.png");
-			// create a new Sprite using the texture
-			var abunny = new PIXI.Sprite(texture);
-
-			// center the sprites anchor point
-			abunny.anchor.x = 0.5;
-			abunny.anchor.y = 0.5;
-
-			// move the sprite t the center of the screen
-			abunny.position.x = 300;
-			abunny.position.y = 100;
-			stage.addChild(abunny);
-			//stage.addChild(bunny.getRef());
-			
-			
-
-			function aanimate() {
-
-				requestAnimFrame( aanimate );
-
-				// just for fun, lets rotate mr rabbit a little
-				abunny.rotation += 0.1;
-				drawObj[0].rotate(0.1);
-				console.log("animate");
-				// render the stage
-				renderer.render(stage);
-			}
-		*/
+	
+		
 		
 	}
+	stage.prototype.registerObject = function(obj){
+		this.objects.push(obj);
+		this.stage.addChild(obj.myObj);
+	}
+	stage.prototype.registerStaticObject = function(obj){
+		this.stage.addChild(obj);
+	}
+	stage.prototype.animation = function(){
+		var resCounter=this.res.length;
+		if(this.res.length>=1){
+			for(var i=0;i<this.objects.length;i++)
+				if(this.res[i]==-1)
+					resCounter--;
+			if(resCounter==0)
+				return -1;
+		}
+		this.res = new Array();
+		for(var i=0;i<this.objects.length;i++)
+			this.res.push(this.objects[i].draw());//DRAW
+		this.renderer.render(this.stage); //RENDER
+		return 1;
+			
+	}
+	stage.prototype.animate = function(){
+		var res;
+		res=st.animation();
+		if(res != 1)
+			return -1;
+		console.log("running: "+res);
+
+		requestAnimationFrame(st.animate);	//CallBack
+	}
+	stage.prototype.setcolor = function(color){
+		this.renderer.backgroundColor = color;
+	}
+	function animate2(stage) {
+	    requestAnimFrame( animate2(stage) );
+		console.log("animate2: "+stage);
+	    
+	};
 	function animate() {
 	    requestAnimFrame( animate );
 	
@@ -223,6 +240,17 @@
 		counter+=next;
 		return 1;
 	}
+	drawObject.prototype.moveFromJson2WithClock = function(clock){
+		if(this.counter+1 > input.length)
+			return -1;
+		if(clock == input[counter].t){
+			goToX(input[counter].x);
+			goToY(input[counter].y);
+			rotate(input[counter].m)
+			counter++;
+		}
+		return input[counter+1].t;
+	}
 	drawObject.prototype.resetCounter = function(){
 		this.counter=0;
 	}
@@ -268,8 +296,139 @@
 		this.myObj.scale.x=value;
 		this.myObj.scale.y=value;
 	}
-	
-
+	drawObject.prototype.getFirstClock = function(){
+		return this.input[0];
+	}
+	drawObject.prototype.draw = function(){
+		if(this.counter > 30){
+			//console.log("draw End (drawObj)");
+			return -1;
+		}
+		this.moveX(1);
+		this.moveY(1);
+		this.counter++;
+		
+	}
+	function player(_lengthOfLegs){
+		this.steps = 0;
+		this.lengthOfLegs = _lengthOfLegs;
+		this.angle=0;
+		this.leftFoot;
+		this.rightFoot;
+		this.monitor;
+		this.clock=0;
+	};
+	player.prototype.show = function(){
+		var r1,r2;
+		if(this.clock==0)
+			this.clock = min(this.rightFoot.getFirstClock(), this.leftFoot.getFirstClock());
+		r1 = this.rightFoot.moveFromJson2WithClock(clock);
+		r2 = this.leftFoot.moveFromJson2WithClock(clock);
+		if(r1 == r2 == -1)
+			return 0;
+		clock = min(r1,r2);
+		return 1;
+	}
+	player.prototype.addFeetMoves = function(jsonFeet){
+		left = new array();
+		right = new array();
+		for(var i=0;i<jsonFeet.foot.length;i++){
+			if(jsonFeet.foot[i].ID=="a")
+				left.push(jsonFeet.foot[i]);
+			else
+				right.push(jsonFeet.foot[i]);
+		}
+		this.leftFoot.input = left;
+		this.rightFoot.input = right;
+	}
+	player.prototype.incStep = function(){
+		this.steps++;
+	}
+	player.prototype.calculateAngle = function(a,b){
+		this.angle;
+	}
+	player.prototype.min = function(a,b){
+		if(a<b)
+			return a;
+		return b;
+	}
+	function tennisField(_maxX,_maxY){
+		this.field = new Array();
+		
+		this.scaleX=this.calculateScaleX(_maxX);
+		this.scaleY=this.calculateScaleY(_maxY);
+		this.nextX=0;
+		this.nextY=0;
+		this.maxX=_maxX;
+		this.maxY=_maxY;
+		this.realSizeX=20.117;
+		this.realSizeY=20.12;
+	};
+	tennisField.prototype.register = function(stage){
+		for(var i=0;i<this.field.length;i++)
+			stage.registerStaticObject(this.field[i]);
+	}
+	tennisField.prototype.calculateScaleX = function(monitorX){
+		return monitorX/20.117;
+	}
+	tennisField.prototype.calculateScaleY = function(monitorY){
+		return monitorY/20.12;
+	}
+	tennisField.prototype.calculateScale = function(real,virtual){
+		return virtual/real;
+	}
+	tennisField.prototype.calculateNext = function(x,y){
+		if(this.nextX+x>=this.maxX){
+			this.nextX=0;
+			this.nextY+=y;
+		}else{
+			this.nextX+=x;
+			this.nextY+=y;
+		}
+	}
+	tennisField.prototype.createOutLeft = function(){
+		var x=20.117;
+		var y=4.57;
+		x*=this.scaleX;
+		y*=this.scaleY;
+		this.field.push(new PIXI.Graphics());
+		var id = this.field.length;
+		this.field[id].beginFill(0xFFFF00);
+		this.field[id].drawRect(this.nextX, this.nextY, x, y);
+		this.calculateNext(x,y);
+	}
+	tennisField.prototype.createOutRight = function(){
+		//x=20.117
+		//y=4.57
+	}
+	tennisField.prototype.createOutBack = function(){
+		//x=8.23
+		//y=20.12
+	}
+	tennisField.prototype.createNoMansLandRight = function(){
+		//x=6.40
+		//y=4.115
+	}
+	tennisField.prototype.createNoMansLandLeft = function(){
+		//x=6.40
+		//y=4.115
+	}
+	tennisField.prototype.createServiceCourtLeft = function(){
+		//x=6.40
+		//y=4.115
+	}
+	tennisField.prototype.createServiceCourtRight = function(){
+		//x=6.40
+		//y=4.115
+	}
+	tennisField.prototype.createDoublesSlidelineLeft = function(){
+		//x=11.89
+		//y=2.74
+	}
+	tennisField.prototype.createDoublesSlidelineRight = function(){
+		//x=11.89
+		//y=2.74
+	}
 	function getPosOfNum(text,counter){
 		var c = counter;
 		var res = 0;
@@ -290,6 +449,7 @@
 		 <select id="select" onchange="onDropDownChange(this.value)">
 		</select>
 		<button onclick="alert('click');">test</button>
+		<button onclick="window.cancelAnimationFrame();">stop</button>
 	</div>
 	<script>
 	var body = document.getElementById("body");
@@ -311,7 +471,34 @@
 	//input = "q1w2e3r4r5t6";
 	//for(var i=0;i<10;i++)
 		//test.moveFromFile();
-		init();
+		//init();
+		
+			var st = new stage(body);
+			//////DELM ME
+				var graphics = new PIXI.Graphics();
+
+				//graphics.beginFill(0xFFFF00);
+
+				// set the line style to have a width of 5 and set the color to red
+				//graphics.lineStyle(5, 0xFF0000);
+
+				// draw a rectangle
+				//graphics.drawRect(0, 0, 300, 200);
+
+				//st.stage.addChild(graphics);
+			/////DEL ME
+			var obj = new drawObject("fLeft.png","A");
+			obj.scale(0.8);
+			obj.goTo(150,150);
+			var tf = new tennisField(200,500);
+			tf.field.push(new PIXI.Graphics());
+			tf.field[0].beginFill(0xFFF000);
+			tf.field[0].drawRect(100, 100, 300, 200);
+			//st.stage.addChild(tf.field[0]);
+			tf.register(st);
+			st.registerObject(obj);
+		//animate2(st);
+		st.animate(st);
 	</script>
 
 	</body>

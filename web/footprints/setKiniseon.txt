@@ -1,4 +1,6 @@
-{ "kiniseis" : [
+{ 
+	"host": "http://127.0.0.1/",
+	"kiniseis" : [
 					{ "name":"Arxiki gonia","id":"1"},
 					{ "name":"Epanafora apo to file","id":"2"},
 					{ "name":"Serve","id":"3"} 
