@@ -27,6 +27,11 @@
 
 </head>
 <script>
+	
+	function a(){
+		//p.rightFoot.goTo(textX,textY);
+		requestAnimationFrame(function(){st.render();});
+	}
 	function onDropDownChange(input){
 		//alert("menu change: "+input);
 		//drawObj[0].resetCounter();
@@ -40,7 +45,10 @@
 				input = textToJson(input);
 				console.log(input);
 				p.addFeetMoves(input);
-				st.registerObject(p);
+				if(!registered){
+					st.registerObject(p);
+					registered=1;
+				}
 				
 				st.reanimate(st);
 			}});
@@ -203,23 +211,23 @@
 		
 	};
 	drawObject.prototype.goTo = function(x,y){
-		this.myObj.position.x=x;
-		this.myObj.position.y=y;
+		this.myObj.position.x=parseFloat(x);
+		this.myObj.position.y=parseFloat(y);
 	};
 	drawObject.prototype.goToX = function(x){
-		this.myObj.position.x=x;
+		this.myObj.position.x=parseFloat(x);
 	};
 	drawObject.prototype.goToY = function(y){
-		this.myObj.position.y=y;
+		this.myObj.position.y=parseFloat(y);
 	};
 	drawObject.prototype.moveX = function(x){
-		this.myObj.position.x+=x;
+		this.myObj.position.x+=parseFloat(x);
 	};
 	drawObject.prototype.moveY = function(y){
-		this.myObj.position.y+=y;
+		this.myObj.position.y+=parseFloat(y);
 	};
 	drawObject.prototype.rotate = function(c){
-		this.myObj.rotation +=c;
+		this.myObj.rotation +=parseFloat(c);
 	}
 	drawObject.prototype.getRef = function(){
 		return this.myObj;
@@ -276,14 +284,17 @@
 		var c = this.counter;
 		console.log("clock:"+clock);
 		if(clock == this.input[c].t){
-			this.goToX(this.input[c].x);
-			this.goToY(this.input[c].y);
-			this.rotate(this.input[c].m)
+			//this.goToX(this.input[c].x);
+			//this.goToY(this.input[c].y);
+			//this.rotate(this.input[c].m);
+			this.moveX(this.input[c].x);
+			this.moveY(this.input[c].y);
+			this.rotate(this.input[c].m);
 			this.counter++;
-			console.log("id= "+this.id+" x= "+this.input[c].x+" y= "+this.input[c].y+" m= "+this.input[c].m+" t= "+this.input[c].t+" counter= "+this.counter);
+			console.log("id= "+this.id+" x= "+this.input[c].x+" y= "+this.input[c].y+" m= "+this.input[c].m+" t= "+this.input[c].t+" counter= "+c+" of "+(this.input.length-1));
 		}
 		//if(this.counter<this.input.length)
-			if(this.counter+1 >= this.input.length)
+			if(this.counter >= this.input.length)
 				return -1;
 			return this.input[this.counter].t;
 		//else
@@ -396,7 +407,8 @@
 		this.rightFoot.input = right;
 		
 		//test
-			this.rightFoot.goTo(150,150);
+			
+		
 		//test
 	}
 	player.prototype.incStep = function(){
@@ -424,17 +436,19 @@
 		if(this.leftFoot!=0)
 			this.leftFoot.resetCounter();
 		if(this.rightFoot!=0)
-			this.leftFoot.resetCounter();
+			this.rightFoot.resetCounter();
 	}
 	player.prototype.createLeftFoot = function(){
 		if(this.leftFoot==0)
 			this.leftFoot= new drawObject("fLeft.png","a");
 		this.leftFoot.scale(0.3);
+		this.leftFoot.goTo(550,250);
 	}
 	player.prototype.createRightFoot = function(){
 		if(this.rightFoot==0)
 			this.rightFoot= new drawObject("fRight.png","d");
 		this.rightFoot.scale(0.3);
+		this.rightFoot.goTo(150,150);
 	}
 	function tennisField(_maxX,_maxY){
 		this.field = new Array();
@@ -582,12 +596,17 @@
 		<h3>Epelekse ena apo ta dia8esima set kiniseon</h3>
 		 <select id="select" onchange="onDropDownChange(this.value)">
 		</select>
-		<button onclick="alert('click');">test</button>
+		<button onclick="test();">test</button>
 		<button onclick="window.cancelAnimationFrame();">stop</button>
+		<input id="x" value="0">
+		<input id="y" value="0">
+		<input id="id" value="0">
+		<button onclick="a();">refresh</button>
 	</div>
 	<script>
 	var body = document.getElementById("body");
 	var dropDownMenu = document.getElementById("select");
+	var registered =0;
 	var width;
 	var height;
 	var stage;
@@ -596,6 +615,9 @@
 	var h;
 	var testX=0;
 	var testY=0;
+	var textX = document.getElementById("x");
+	var textY = document.getElementById("y");
+	var textID = document.getElementById("id");
 	
 	//getFileAndStartAnimate("eicar.com.txt");
 	//var test = new drawObject("bunny.png",0,0);
@@ -624,18 +646,31 @@
 			/////DEL ME
 			var testobj = new drawObject("fLeft.png","A");
 			testobj.scale(0.8);
-			testobj.goTo(150,150);
-			var tf = new tennisField(200,500);
+			testobj.goTo(350,150);
+			var tf = new tennisField(st.width,st.height);
 			//tf.field.push(new PIXI.Graphics());
 			//tf.field[0].beginFill(0xFFF000);
 			//tf.field[0].drawRect(100, 100, 300, 200);
 			
 			tf.register(st);
-			//st.registerObject(obj);
+			//st.registerObject(testobj);
 			st.setColor(0xFFF0F0);
+			p.createRightFoot();
+			p.createLeftFoot();
+			st.registerObject(p);
+					registered=1;
 			
 		//animate2(st);
-		st.animate(st);
+		//st.animate(st);
+		function test(){
+			
+			console.log("X: "+textX.value+" Y: "+textY.value+" R: "+textID.value);
+			
+			p.rightFoot.moveX(parseInt(textX.value));
+			p.rightFoot.moveY(parseInt(textY.value));
+			p.rightFoot.rotate(parseFloat(textID.value));
+			a();
+		}
 	</script>
 
 	</body>
