@@ -29,9 +29,9 @@
 <script>
 	function onDropDownChange(input){
 		//alert("menu change: "+input);
-		drawObj[0].resetCounter();
+		//drawObj[0].resetCounter();
 		//getFileAndStartAnimate("eicar.com.txt");
-		getFileAndFillPlayerWithMoves("movesJSON.txt");
+		getFileAndFillPlayerWithMoves("movesJSON3.txt");
 	};
 	function getFileAndFillPlayerWithMoves(Url){
 			$.ajax({url: Url, success: function(result){
@@ -39,7 +39,10 @@
 				//alert(input);
 				input = textToJson(input);
 				console.log(input);
-				//animate();
+				p.addFeetMoves(input);
+				st.registerObject(p);
+				
+				st.reanimate(st);
 			}});
 	};
 	function getFileAndStartAnimate(Url){
@@ -77,6 +80,7 @@
 			height = body.clientHeight;
 		this.objects = new Array();
 		this.res = new Array();
+		requestAnimationFrame(function(){st.render();});
 		//drawObj.push(new drawObject("fLeft.png"),"A");
 		//drawObj.push(new drawObject("rectangle"),"B");
 		
@@ -90,38 +94,62 @@
 	}
 	stage.prototype.registerObject = function(obj){
 		this.objects.push(obj);
-		this.stage.addChild(obj.myObj);
+		if(obj.constructor.name=="drawObject"){
+			this.stage.addChild(obj.myObj);
+		}else{
+			var objects = obj.getDrawObjects();
+			for(var i=0;i<objects.length;i++)
+				this.stage.addChild(objects[i]);
+				//this.stage.addChild(testobj.myObj);
+		}
 	}
 	stage.prototype.registerStaticObject = function(obj){
 		this.stage.addChild(obj);
 	}
 	stage.prototype.animation = function(){
+		if(this.objects.length==0) //An den uparxoun antikimena gia draw
+			return -1;				//exit
+		for(var i=0;i<this.objects.length;i++)
+			this.res.push(this.objects[i].draw());//DRAW
+		this.renderer.render(this.stage); //RENDER
+		//elenxos an uparxoun allages meta to Draw
 		var resCounter=this.res.length;
 		if(this.res.length>=1){
 			for(var i=0;i<this.objects.length;i++)
 				if(this.res[i]==-1)
 					resCounter--;
+		//an oxi eksodos	
 			if(resCounter==0)
 				return -1;
 		}
 		this.res = new Array();
-		for(var i=0;i<this.objects.length;i++)
-			this.res.push(this.objects[i].draw());//DRAW
-		this.renderer.render(this.stage); //RENDER
+		//allios sunexise
 		return 1;
 			
 	}
+	stage.prototype.resetCounters = function(){
+		for(var i=0;i<this.objects.length;i++)
+			this.objects[i].resetCounter();
+	}
 	stage.prototype.animate = function(){
 		var res;
-		res=st.animation();
+			res=st.animation();
+		console.log("animation result: "+res);
 		if(res != 1)
 			return -1;
-		console.log("running: "+res);
 
 		requestAnimationFrame(st.animate);	//CallBack
 	}
-	stage.prototype.setcolor = function(color){
+	stage.prototype.setColor = function(color){
 		this.renderer.backgroundColor = color;
+		requestAnimationFrame(function(){st.render();});
+	}
+	stage.prototype.reanimate = function(){
+		this.resetCounters();
+		this.animate();
+	}
+	stage.prototype.render = function(){
+		this.renderer.render(this.stage);
 	}
 	function animate2(stage) {
 	    requestAnimFrame( animate2(stage) );
@@ -169,7 +197,7 @@
 		this.myObj.anchor.x = 0.1;
 		this.myObj.anchor.y = 0.1; 
 		this.counter=0;
-		this.input;
+		this.input=0;
 		this.id=ID;
 		
 		
@@ -181,7 +209,7 @@
 	drawObject.prototype.goToX = function(x){
 		this.myObj.position.x=x;
 	};
-	drawObject.prototype.gotoY = function(y){
+	drawObject.prototype.goToY = function(y){
 		this.myObj.position.y=y;
 	};
 	drawObject.prototype.moveX = function(x){
@@ -241,15 +269,25 @@
 		return 1;
 	}
 	drawObject.prototype.moveFromJson2WithClock = function(clock){
-		if(this.counter+1 > input.length)
+		if(this.counter >= this.input.length)
 			return -1;
-		if(clock == input[counter].t){
-			goToX(input[counter].x);
-			goToY(input[counter].y);
-			rotate(input[counter].m)
-			counter++;
+		if(this.input==0)
+			return -1;
+		var c = this.counter;
+		console.log("clock:"+clock);
+		if(clock == this.input[c].t){
+			this.goToX(this.input[c].x);
+			this.goToY(this.input[c].y);
+			this.rotate(this.input[c].m)
+			this.counter++;
+			console.log("id= "+this.id+" x= "+this.input[c].x+" y= "+this.input[c].y+" m= "+this.input[c].m+" t= "+this.input[c].t+" counter= "+this.counter);
 		}
-		return input[counter+1].t;
+		//if(this.counter<this.input.length)
+			if(this.counter+1 >= this.input.length)
+				return -1;
+			return this.input[this.counter].t;
+		//else
+			//return -2;
 	}
 	drawObject.prototype.resetCounter = function(){
 		this.counter=0;
@@ -297,7 +335,8 @@
 		this.myObj.scale.y=value;
 	}
 	drawObject.prototype.getFirstClock = function(){
-		return this.input[0];
+		//console.log("clock: Name: "+this.input[0].t.constructor.name+" type: "+typeof(this.input[0].t));
+		return this.input[0].t;
 	}
 	drawObject.prototype.draw = function(){
 		if(this.counter > 30){
@@ -313,33 +352,52 @@
 		this.steps = 0;
 		this.lengthOfLegs = _lengthOfLegs;
 		this.angle=0;
-		this.leftFoot;
-		this.rightFoot;
+		this.leftFoot=0;
+		this.rightFoot=0;
 		this.monitor;
-		this.clock=0;
+		this.clock=-1;
 	};
-	player.prototype.show = function(){
+	player.prototype.draw = function(){//abstract
+		if(this.rightFoot!=0 && this.leftFoot!=0){
 		var r1,r2;
-		if(this.clock==0)
-			this.clock = min(this.rightFoot.getFirstClock(), this.leftFoot.getFirstClock());
-		r1 = this.rightFoot.moveFromJson2WithClock(clock);
-		r2 = this.leftFoot.moveFromJson2WithClock(clock);
-		if(r1 == r2 == -1)
-			return 0;
-		clock = min(r1,r2);
+		//console.log( this.rightFoot.constructor.name);
+		if(this.clock==-1)
+			this.clock = this.min(this.rightFoot.getFirstClock(), this.leftFoot.getFirstClock());
+		r1 = this.rightFoot.moveFromJson2WithClock(this.clock);
+		r2 = this.leftFoot.moveFromJson2WithClock(this.clock);
+		console.log("player: Draw! r1= "+r1+" r2= "+r2);
+		if(r1==-1)
+			r1=r2;
+		if(r2==-1)
+			r2=r1;
+		if(r1 == -1 && r2 == -1)
+			return -1;
+		this.clock = this.min(r1,r2);
+		console.log("min= "+this.clock);
 		return 1;
+		}else{
+			return -1;
+		}
 	}
 	player.prototype.addFeetMoves = function(jsonFeet){
-		left = new array();
-		right = new array();
+		left = new Array();
+		right = new Array();
 		for(var i=0;i<jsonFeet.foot.length;i++){
 			if(jsonFeet.foot[i].ID=="a")
 				left.push(jsonFeet.foot[i]);
 			else
 				right.push(jsonFeet.foot[i]);
 		}
+		console.log(left);
+		console.log(right);
+		this.createLeftFoot();
+		this.createRightFoot();
 		this.leftFoot.input = left;
 		this.rightFoot.input = right;
+		
+		//test
+			this.rightFoot.goTo(150,150);
+		//test
 	}
 	player.prototype.incStep = function(){
 		this.steps++;
@@ -348,9 +406,35 @@
 		this.angle;
 	}
 	player.prototype.min = function(a,b){
+		//console.log("clock: Name: "+a.constructor.name+" type: "+typeof(a));
 		if(a<b)
 			return a;
 		return b;
+	}
+	player.prototype.getDrawObjects = function(){
+		res = new Array();
+		if(this.leftFoot!=0)
+			res.push(this.leftFoot.myObj);
+		if(this.rightFoot!=0)
+			res.push(this.rightFoot.myObj);
+		return res;
+	}
+	player.prototype.resetCounter = function(){//abstract
+		this.clock=-1;
+		if(this.leftFoot!=0)
+			this.leftFoot.resetCounter();
+		if(this.rightFoot!=0)
+			this.leftFoot.resetCounter();
+	}
+	player.prototype.createLeftFoot = function(){
+		if(this.leftFoot==0)
+			this.leftFoot= new drawObject("fLeft.png","a");
+		this.leftFoot.scale(0.3);
+	}
+	player.prototype.createRightFoot = function(){
+		if(this.rightFoot==0)
+			this.rightFoot= new drawObject("fRight.png","d");
+		this.rightFoot.scale(0.3);
 	}
 	function tennisField(_maxX,_maxY){
 		this.field = new Array();
@@ -363,16 +447,31 @@
 		this.maxY=_maxY;
 		this.realSizeX=20.117;
 		this.realSizeY=20.12;
+		/////// TEST
+			/*
+			this.nextX=30; this.nextY=30;
+			this.createRectagle(this.nextX, this.nextY, 30, 30, 0xFFF000);
+			this.calculateNext(30,30);
+			for(var i=0;i<1;i++){
+			this.createRectagle(this.nextX, this.nextY, 30, 30, 0xFFF000);
+			this.calculateNext(30,30);
+			}
+			*/
+			this.createOutLeft();
+			this.createOutBack();
+			this.createDoublesSlidelineLeft();
+			//this.createNoMansLandLeft();
+		///////  TEST
 	};
 	tennisField.prototype.register = function(stage){
 		for(var i=0;i<this.field.length;i++)
 			stage.registerStaticObject(this.field[i]);
 	}
 	tennisField.prototype.calculateScaleX = function(monitorX){
-		return monitorX/20.117;
+		return monitorX/this.meterToPixel(20.117);
 	}
 	tennisField.prototype.calculateScaleY = function(monitorY){
-		return monitorY/20.12;
+		return monitorY/this.meterToPixel(20.12);
 	}
 	tennisField.prototype.calculateScale = function(real,virtual){
 		return virtual/real;
@@ -381,20 +480,23 @@
 		if(this.nextX+x>=this.maxX){
 			this.nextX=0;
 			this.nextY+=y;
+		}else if(this.nextY+y>=this.maxY){
+			this.nextY=0;
+			this.nextX+=x;
 		}else{
 			this.nextX+=x;
-			this.nextY+=y;
+			
 		}
 	}
 	tennisField.prototype.createOutLeft = function(){
 		var x=20.117;
 		var y=4.57;
+		var color=0xFFF000;
+		x= this.meterToPixel(x);
+		y= this.meterToPixel(y);
 		x*=this.scaleX;
 		y*=this.scaleY;
-		this.field.push(new PIXI.Graphics());
-		var id = this.field.length;
-		this.field[id].beginFill(0xFFFF00);
-		this.field[id].drawRect(this.nextX, this.nextY, x, y);
+		this.createRectagle(this.nextX, this.nextY, x, y,color);
 		this.calculateNext(x,y);
 	}
 	tennisField.prototype.createOutRight = function(){
@@ -402,16 +504,30 @@
 		//y=4.57
 	}
 	tennisField.prototype.createOutBack = function(){
-		//x=8.23
-		//y=20.12
+		var x=8.23
+		var y=20.12
+		var color=0xFFF000;
+		x= this.meterToPixel(x);
+		y= this.meterToPixel(y);
+		x*=this.scaleX;
+		y*=this.scaleY;
+		this.createRectagle(this.nextX, this.nextY, x, y,color);
+		this.calculateNext(x,y);
 	}
 	tennisField.prototype.createNoMansLandRight = function(){
 		//x=6.40
 		//y=4.115
 	}
 	tennisField.prototype.createNoMansLandLeft = function(){
-		//x=6.40
-		//y=4.115
+		var x=6.40
+		var y=4.115
+		var color=0xFFF000;
+		x= this.meterToPixel(x);
+		y= this.meterToPixel(y);
+		x*=this.scaleX;
+		y*=this.scaleY;
+		this.createRectagle(this.nextX, this.nextY, x, y,color);
+		this.calculateNext(x,y);
 	}
 	tennisField.prototype.createServiceCourtLeft = function(){
 		//x=6.40
@@ -422,13 +538,31 @@
 		//y=4.115
 	}
 	tennisField.prototype.createDoublesSlidelineLeft = function(){
-		//x=11.89
-		//y=2.74
+		var x=11.89
+		var y=2.74
+		var color=0xFFF000;
+		x= this.meterToPixel(x);
+		y= this.meterToPixel(y);
+		x*=this.scaleX;
+		y*=this.scaleY;
+		this.createRectagle(this.nextX, this.nextY, x, y,color);
+		this.calculateNext(x,y);
 	}
 	tennisField.prototype.createDoublesSlidelineRight = function(){
 		//x=11.89
 		//y=2.74
 	}
+	tennisField.prototype.createRectagle = function(posX,posY,sizeX,sizeY,color){
+		this.field.push(new PIXI.Graphics());
+		var id = this.field.length-1;
+		this.field[id].beginFill(color);
+		this.field[id].drawRect(posX, posY, sizeX, sizeY);
+		//console.log("create@: posX: "+posX+"-"+(posX+sizeX)+", posY: "+posY+"-"+(posY+sizeY));
+	}
+	tennisField.prototype.meterToPixel = function(meter){
+		return 0.000264583 * meter;
+	}
+	
 	function getPosOfNum(text,counter){
 		var c = counter;
 		var res = 0;
@@ -474,6 +608,7 @@
 		//init();
 		
 			var st = new stage(body);
+			var p = new player();
 			//////DELM ME
 				var graphics = new PIXI.Graphics();
 
@@ -487,16 +622,18 @@
 
 				//st.stage.addChild(graphics);
 			/////DEL ME
-			var obj = new drawObject("fLeft.png","A");
-			obj.scale(0.8);
-			obj.goTo(150,150);
+			var testobj = new drawObject("fLeft.png","A");
+			testobj.scale(0.8);
+			testobj.goTo(150,150);
 			var tf = new tennisField(200,500);
-			tf.field.push(new PIXI.Graphics());
-			tf.field[0].beginFill(0xFFF000);
-			tf.field[0].drawRect(100, 100, 300, 200);
-			//st.stage.addChild(tf.field[0]);
+			//tf.field.push(new PIXI.Graphics());
+			//tf.field[0].beginFill(0xFFF000);
+			//tf.field[0].drawRect(100, 100, 300, 200);
+			
 			tf.register(st);
-			st.registerObject(obj);
+			//st.registerObject(obj);
+			st.setColor(0xFFF0F0);
+			
 		//animate2(st);
 		st.animate(st);
 	</script>
