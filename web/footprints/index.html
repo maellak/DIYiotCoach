@@ -459,6 +459,8 @@
 		this.nextY=0;
 		this.maxX=_maxX;
 		this.maxY=_maxY;
+		this.untilY= new Array();
+		this.storeX= new Array();
 		this.realSizeX=20.117;
 		this.realSizeY=20.12;
 		/////// TEST
@@ -470,11 +472,14 @@
 			this.createRectagle(this.nextX, this.nextY, 30, 30, 0xFFF000);
 			this.calculateNext(30,30);
 			}
-			*/
-			this.createOutLeft();
-			this.createOutBack();
-			this.createDoublesSlidelineLeft();
+			*/ 
+			//this.createOutLeft();
+			//this.createOutBack();
+			//this.createDoublesSlidelineLeft();
+			this.createNoMansLandLeft();
 			//this.createNoMansLandLeft();
+			//this.createServiceCourtLeft();
+			//this.createNoMansLandRight();
 		///////  TEST
 	};
 	tennisField.prototype.register = function(stage){
@@ -491,80 +496,105 @@
 		return virtual/real;
 	}
 	tennisField.prototype.calculateNext = function(x,y){
-		if(this.nextX+x>=this.maxX){
-			this.nextX=0;
+		// x einai to teleuteo pixel pou exei zografisei
+		// y einai to teleuteo pixel pou exei zografisei
+		oldNextX = this.nextX;
+			var i = this.untilY.length-1;
+			if(this.untilY[i]<=y){ 
+				this.untilY.splice(i, 1);//remove element
+				this.storeX.splice(i, 1);//remove element
+			}
+				
+		if(this.nextX+x>=this.maxX){//An exei ftasei sto telos
+			if(this.untilY.length>=1){	// Kai uparxei kapia esoxi
+				this.nextX=this.storeX[this.storeX.length-1];
+				this.storeX[this.storeX.length-1]=oldNextX+x;
+			}else{//An Den uparxei esoxi
+				this.nextX=0;
+			}
 			this.nextY+=y;
-		}else if(this.nextY+y>=this.maxY){
-			this.nextY=0;
-			this.nextX+=x;
-		}else{
-			this.nextX+=x;
-			
+		}else{ //An den exei ftasei sto telos
+			if(this.untilY.length>=1){// Kai uparxei kapia esoxi
+				this.nextX=this.storeX[this.storeX.length-1];
+				this.storeX[this.storeX.length-1]=x;
+			}else{//kai den exei esoxi
+				this.nextX=x;
+				this.untilY.push(y);
+				this.storeX.push(x);
+			}
+		
+			console.log("next Draw@x= "+this.nextX+" y= "+this.nextY);
+		
 		}
 	}
 	tennisField.prototype.createOutLeft = function(){
 		var x=20.117;
 		var y=4.57;
-		var color=0xFFF000;
-		x= this.meterToPixel(x);
-		y= this.meterToPixel(y);
-		x*=this.scaleX;
-		y*=this.scaleY;
+		var color=0xff00d2;
+		x = this.convertMeterToPixelX(x);
+		y = this.convertMeterToPixelY(y);
 		this.createRectagle(this.nextX, this.nextY, x, y,color);
 		this.calculateNext(x,y);
 	}
 	tennisField.prototype.createOutRight = function(){
 		//x=20.117
 		//y=4.57
+		var color=0xff00d2;
 	}
 	tennisField.prototype.createOutBack = function(){
 		var x=8.23
-		var y=20.12
-		var color=0xFFF000;
-		x= this.meterToPixel(x);
-		y= this.meterToPixel(y);
-		x*=this.scaleX;
-		y*=this.scaleY;
+		var y=10.97;
+		var color=0xff00d2;
+		x = this.convertMeterToPixelX(x);
+		y = this.convertMeterToPixelY(y);
 		this.createRectagle(this.nextX, this.nextY, x, y,color);
 		this.calculateNext(x,y);
 	}
 	tennisField.prototype.createNoMansLandRight = function(){
-		//x=6.40
-		//y=4.115
+		var x=5.49;
+		var y=4.115;
+		var color=0xFFF000;
+		x = this.convertMeterToPixelX(x);
+		y = this.convertMeterToPixelY(y);
+		this.createRectagle(this.nextX, this.nextY, x, y,color);
+		this.calculateNext(x,y);
 	}
 	tennisField.prototype.createNoMansLandLeft = function(){
-		var x=6.40
+		var x=5.49;
 		var y=4.115
 		var color=0xFFF000;
-		x= this.meterToPixel(x);
-		y= this.meterToPixel(y);
-		x*=this.scaleX;
-		y*=this.scaleY;
+		x = this.convertMeterToPixelX(x);
+		y = this.convertMeterToPixelY(y);
 		this.createRectagle(this.nextX, this.nextY, x, y,color);
 		this.calculateNext(x,y);
 	}
 	tennisField.prototype.createServiceCourtLeft = function(){
-		//x=6.40
-		//y=4.115
+		var x=6.40;
+		var y=4.115
+		var color=0xbbf144;
+		x = this.convertMeterToPixelX(x);
+		y = this.convertMeterToPixelY(y);
+		this.createRectagle(this.nextX, this.nextY, x, y,color);
+		this.calculateNext(x,y);
 	}
 	tennisField.prototype.createServiceCourtRight = function(){
 		//x=6.40
 		//y=4.115
+		var color=0xbbf144;
 	}
 	tennisField.prototype.createDoublesSlidelineLeft = function(){
-		var x=11.89
-		var y=2.74
-		var color=0xFFF000;
-		x= this.meterToPixel(x);
-		y= this.meterToPixel(y);
-		x*=this.scaleX;
-		y*=this.scaleY;
+		var x=11.89;
+		var y=1.37;
+		var color=0x004c00;
+		x = this.convertMeterToPixelX(x);
+		y = this.convertMeterToPixelY(y);
 		this.createRectagle(this.nextX, this.nextY, x, y,color);
 		this.calculateNext(x,y);
 	}
 	tennisField.prototype.createDoublesSlidelineRight = function(){
-		//x=11.89
-		//y=2.74
+		var x=11.89;
+		var y=1.37;
+		var color=0x004c00;
 	}
 	tennisField.prototype.createRectagle = function(posX,posY,sizeX,sizeY,color){
 		this.field.push(new PIXI.Graphics());
@@ -576,6 +606,39 @@
 	tennisField.prototype.meterToPixel = function(meter){
 		return 0.000264583 * meter;
 	}
+	tennisField.prototype.getPercentOfRealX = function(meter){
+		var percent =(meter/this.realSizeX)*100;
+		console.log("X: "+meter+"====>"+percent+"%");
+		return  percent;
+	}
+	tennisField.prototype.getPercentOfRealY = function(meter){
+		var percent =(meter/this.realSizeY)*100;
+		console.log("Y: "+meter+"====>"+percent+"%");
+		return  percent;
+	}
+	tennisField.prototype.getPixelsFromPercentX = function(percent){
+		var pixel = (this.maxX * percent)/100;
+		console.log("X: "+percent+"% ====> "+pixel );
+		return  pixel;
+	}
+	tennisField.prototype.getPixelsFromPercentY = function(percent){
+		var pixel = (this.maxY * percent)/100;
+		console.log("Y: "+percent+"% ====> "+pixel );
+		return  pixel;
+	}
+	tennisField.prototype.convertMeterToPixelX = function(meter){
+		var x = meter;
+		x= this.getPercentOfRealX(x);
+		x=this.getPixelsFromPercentX(x);
+		return x;
+	}
+	tennisField.prototype.convertMeterToPixelY = function(meter){
+		var y = meter;
+		y= this.getPercentOfRealY(y);
+		y=this.getPixelsFromPercentY(y);
+		return y;
+	}
+	
 	
 	function getPosOfNum(text,counter){
 		var c = counter;
@@ -647,7 +710,7 @@
 			var testobj = new drawObject("fLeft.png","A");
 			testobj.scale(0.8);
 			testobj.goTo(350,150);
-			var tf = new tennisField(st.width,st.height);
+			var tf = new tennisField(800,600);
 			//tf.field.push(new PIXI.Graphics());
 			//tf.field[0].beginFill(0xFFF000);
 			//tf.field[0].drawRect(100, 100, 300, 200);
